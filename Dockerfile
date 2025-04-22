@@ -8,10 +8,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Set environment variables here (ENV) or pass them when running the container
-ENV MQTT_BROKER=your_broker
-ENV MQTT_PORT=1883
-ENV MQTT_TOPIC=foxess/raw
-ENV FOXESS_SN=YOUR_SERIAL_NUMBER
+#ENV MQTT_BROKER=your_broker
+#ENV MQTT_PORT=1883
+#ENV MQTT_TOPIC=foxess/raw
+#ENV FOXESS_SN=YOUR_SERIAL_NUMBER
 # ... other variables ...
 
 # Port exposed by app.py

@@ -92,4 +92,4 @@ if __name__ == '__main__':
     logging.info("Starting Flask Log Viewer application...")
     mqtt_handler.start()
     # do not use debug=True, it causes connection issues
-    app.run(debug=False, host='0.0.0.0', port=5000)
+    app.run(debug=False, host='0.0.0.0', port=8080)
