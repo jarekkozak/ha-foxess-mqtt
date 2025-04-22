@@ -19,12 +19,6 @@
 import os
 import logging
 
-# MQTT_BROKER = "10.2.93.20"
-# MQTT_PORT = 1883
-# MQTT_TOPIC = "topic1"
-# MQTT_USER = "mqtt"
-# MQTT_PASSWORD = "mqtt1234"
-# MQTT_CLIENT_ID= 'clientid'
 
 MQTT_BROKER = "MQTT_BROKER"
 MQTT_PORT = "MQTT_PORT"
@@ -57,7 +51,7 @@ def get_foxess_env():
 def get_mqtt_params():
     return {
         MQTT_BROKER : os.getenv(MQTT_BROKER),
-        MQTT_PORT : int(os.getenv(MQTT_PORT)),
+        MQTT_PORT : int(os.getenv(MQTT_PORT,1883)),
         MQTT_TOPIC : os.getenv(MQTT_TOPIC),
         MQTT_USER : os.getenv(MQTT_USER),
         MQTT_PASSWORD : os.getenv(MQTT_PASSWORD),
