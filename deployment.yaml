@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: foxess-rs485
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: foxess-rs485
+  template:
+    metadata:
+      labels:
+        app: foxess-rs485
+    spec:
+      containers:
+      - name: foxess-rs485
+        image: foxess-rs485:latest
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          failureThreshold: 30
+          periodSeconds: 10
