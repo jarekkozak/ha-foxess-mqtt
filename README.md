@@ -37,7 +37,7 @@ Special thanks to **assembly12** for their work on the [Foxess-T-series-ESPHome-
 3.  **Home Assistant**: A running instance with the MQTT integration correctly configured.
 4.  **MQTT Data Source**: A mechanism (e.g., an RS485-to-MQTT bridge connected to the inverter) sending *raw* binary data from the Foxess inverter to the specified MQTT topic. **This project does *not* implement reading from RS485, only listening on MQTT.**
 5.  **Foxess T-Series Inverter**: A compatible inverter (e.g., T20G3).
-
+6.  **RS485 to MQTT converter e.g. https://github.com/nathanmarlor/foxess_modbus/wiki/USR-W610
 ## Configuration
 
 Configuration is done using environment variables. The `helper.py` file defines the expected variables:
