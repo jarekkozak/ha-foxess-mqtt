@@ -4,6 +4,10 @@ Integration of Foxess T-Series photovoltaic inverter (e.g., T20G3) with Home Ass
 
 This project listens on a specific MQTT topic where raw data from the Foxess inverter is expected (e.g., via an RS485-to-MQTT bridge). It then parses this data, extracts sensor values, and publishes them to Home Assistant using the MQTT Discovery mechanism.
 
+Version of inverter I have does not support modbus communication, only raw rs485 messages are available on the inverter interface.
+
+For more information how to connect inverter look at links provided  below
+
 ## Acknowledgements
 
 Special thanks to **assembly12** for their work on the [Foxess-T-series-ESPHome-Home-Assistant](https://github.com/assembly12/Foxess-T-series-ESPHome-Home-Assistant) project, which served as an inspiration for this implementation. Their efforts provided a valuable starting point.
@@ -38,6 +42,11 @@ Special thanks to **assembly12** for their work on the [Foxess-T-series-ESPHome-
 4.  **MQTT Data Source**: A mechanism (e.g., an RS485-to-MQTT bridge connected to the inverter) sending *raw* binary data from the Foxess inverter to the specified MQTT topic. **This project does *not* implement reading from RS485, only listening on MQTT.**
 5.  **Foxess T-Series Inverter**: A compatible inverter (e.g., T20G3).
 6.  **RS485 to MQTT converter e.g. https://github.com/nathanmarlor/foxess_modbus/wiki/USR-W610
+7. **Converter connected to Foxess inverter. 
+
+Converter has to be configured to send raw serial messages to mqtt.
+
+
 ## Configuration
 
 Configuration is done using environment variables. The `helper.py` file defines the expected variables:
