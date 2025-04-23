@@ -201,3 +201,5 @@ Code can be extended
 **foxess_sensor_handler** is responsible to send frames to HA, can be replaced by other type of integration.
 
 **foxess_parser_ddata_tseries.py** is responsible for parsing t20g3 protocol.
+
+**Important** The same instance of mqtt has to be used as for HA
