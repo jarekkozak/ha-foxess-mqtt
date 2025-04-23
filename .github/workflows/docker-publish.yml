@@ -10,7 +10,7 @@ on:
 jobs:
   build_and_push:
     runs-on: ubuntu-latest # Na jakiej maszynie uruchomić zadanie
-
+    environment: dockerhub
     steps:
     - name: Checkout code
       uses: actions/checkout@v4 # Krok pobierający kod repozytorium
