@@ -83,7 +83,7 @@ def health():
 
 @app.route('/ready')
 def ready():
-    if mqtt_handler.is_connected() and mqtt_handler.is_message_received() and mqtt_handler.is_thread_running():
+    if mqtt_handler.is_connected() and mqtt_handler.is_thread_running():
         return Response(status=200)
     else:
         return Response(status=500)
