@@ -20,7 +20,7 @@ import logging
 import sys
 import collections
 from flask import Flask, render_template, jsonify, Response
-from helper import get_mqtt_params, get_foxess_env
+from helper import get_mqtt_params, get_foxess_env,set_logger_state
 from mqtt_handler import MqttHandler
 
 MAX_LOG_LINES = 100
@@ -50,9 +50,10 @@ console_handler.setFormatter(log_formatter)
 
 # We configure the main logger (root) or a specific application logger
 logger = logging.getLogger() # You can use logging.getLogger('my_app') if you prefer
-logger.setLevel(logging.INFO) # Set the logging level (e.g., DEBUG, INFO, WARNING)
 logger.addHandler(queue_handler)
 logger.addHandler(console_handler)
+
+set_logger_state()
 
 mqtt = get_mqtt_params()
 foxess = get_foxess_env()

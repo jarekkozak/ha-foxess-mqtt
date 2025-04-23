@@ -30,7 +30,6 @@ logger = logging.getLogger(__name__)
 
 STATUS_ONLINE = "ONLINE"
 STATUS_OFFLINE = "OFFLINE"
-TIMEZONE = 'UTC'
 
 class FoxessTSeriesDataParser:
     """
@@ -86,14 +85,14 @@ class FoxessTSeriesDataParser:
     FAULT_MESSAGES = [123, 127, 131, 135, 139, 143, 147, 149]
 
 
-    def __init__(self):
+    def __init__(self,timezone='UTC'):
         self.SERIES = None
         self.MODEL = None
         self.SN = None
-        self.tz = TIMEZONE
+        self.tz = timezone
         self.messages = []
         self.latest_message = {}  # Store the latest parsed message
-
+        logger.debug(f"Foxess Timezone {timezone}")
 
 
     @staticmethod

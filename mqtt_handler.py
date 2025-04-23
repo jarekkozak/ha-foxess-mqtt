@@ -28,7 +28,7 @@ from foxess_sensors_handler import FoxessSensorsHandler
 import paho.mqtt.client as mqtt
 import threading
 from datetime import datetime, timedelta
-from helper import set_logger_state,MQTT_CLIENT_ID,MQTT_USER,MQTT_PASSWORD,MQTT_PORT,MQTT_TOPIC,MQTT_BROKER
+from helper import set_logger_state,MQTT_CLIENT_ID,MQTT_USER,MQTT_PASSWORD,MQTT_PORT,MQTT_TOPIC,MQTT_BROKER,FOXESS_TIME_ZONE
 import collections
 import logging
 
@@ -58,7 +58,7 @@ class MqttHandler:
         self.message_received = False
         self.thread_running = False
         self.CACHE = bytearray()
-        self.parser = FoxessTSeriesDataParser()
+        self.parser = FoxessTSeriesDataParser(timezone=foxess.get(FOXESS_TIME_ZONE,'UTC'))
         self.status = STATUS_ONLINE
         self.last_message_timestamp = datetime.now()
         self.history = collections.deque(maxlen=MAX_HISTORY_BUFFER)
