@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+import json
 # ha-foxess-mqtt
 # Copyright (C) 2025 Jarosław Kozak <jaroslaw.kozak68@gmail.com>
 #
@@ -58,16 +58,20 @@ set_logger_state()
 mqtt = get_mqtt_params()
 foxess = get_foxess_env()
 mqtt_handler = MqttHandler(log=logger, mqtt_param=mqtt, foxess=foxess)
+logger.info(str(mqtt))
 
 # --- Flask Application ---
 app = Flask(__name__)
 
-@app.route('/')
-def index():
+def get_env_vars():
     env = dict()
     env.update(get_mqtt_params())
     env.update(get_foxess_env())
-    return render_template('index.html',env_vars=env)
+    return env
+
+@app.route('/')
+def index():
+    return render_template('index.html',env_vars=get_env_vars())
 
 @app.route('/logs')
 def get_logs():
@@ -90,7 +94,10 @@ def ready():
 
 
 if __name__ == '__main__':
-    logging.info("Starting Flask Log Viewer application...")
+    logger.info("Starting Flask Log Viewer application...")
+    logger.info("Envinroment vars:")
+    logger.info(json.dumps(mqtt,indent=4))
+    logger.info(json.dumps(foxess, indent=4))
     mqtt_handler.start()
     # do not use debug=True, it causes connection issues
     app.run(debug=False, host='0.0.0.0', port=8080)

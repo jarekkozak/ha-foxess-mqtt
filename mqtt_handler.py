@@ -58,7 +58,6 @@ class MqttHandler:
         self.message_received = False
         self.thread_running = False
         self.CACHE = bytearray()
-        self.parser = FoxessTSeriesDataParser(timezone=foxess.get(FOXESS_TIME_ZONE,'UTC'))
         self.status = STATUS_ONLINE
         self.last_message_timestamp = datetime.now()
         self.history = collections.deque(maxlen=MAX_HISTORY_BUFFER)
@@ -67,6 +66,7 @@ class MqttHandler:
         self.mqtt_sensor = mqtt_param
         self.mqtt_sensor[MQTT_CLIENT_ID] = self.mqtt_sensor[MQTT_CLIENT_ID] + "_ha"
         self.sensors = None
+        self.parser = None
 
     def on_connect(self, client, userdata, flags, rc, prop):
         if rc == 0:
@@ -88,6 +88,10 @@ class MqttHandler:
 
         self.CACHE.extend(msg.payload)
         self.CACHE = self.parser.parse_data(self.CACHE)
+
+        if self.parser is None:
+            return
+
         parsed_frames = self.parser.get_messages()
 
         self.status = STATUS_ONLINE
@@ -123,6 +127,7 @@ class MqttHandler:
         self.client.on_disconnect = lambda client,flags,userdata,rc, prop: self.on_disconnect(client, flags, userdata, rc, prop )
         self.client.on_message = lambda client, userdata, msg: self.on_message(client, userdata, msg)
 
+        self.parser = FoxessTSeriesDataParser(timezone=self.foxess.get(FOXESS_TIME_ZONE,'UTC'))
         self.sensors= FoxessSensorsHandler(self.mqtt_sensor,foxess=self.foxess)
 
         try:

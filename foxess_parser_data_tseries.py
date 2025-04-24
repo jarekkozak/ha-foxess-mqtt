@@ -126,7 +126,7 @@ class FoxessTSeriesDataParser:
         crc = binascii.crc32(frame[:-2]) & 0xFFFF
         crc_frame = frame[-2:]
         crc_bytes = crc.to_bytes(2, byteorder='big')
-        print(crc_frame.hex(), crc_bytes.hex())
+        #print(crc_frame.hex(), crc_bytes.hex())
         return crc_frame == crc_bytes
 
     @staticmethod

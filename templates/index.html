@@ -76,7 +76,7 @@
 
         async function fetchLogs() {
             try {
-                const response = await fetch('/logs');
+                const response = await fetch('logs');
                 if (!response.ok) {
                     throw new Error(`HTTP Error: ${response.status}`);
                 }
