@@ -1,0 +1,38 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: foxess
+
+---
+# Ensure that values are encoded in  Base64!
+# echo -n 'mqtt' | base64 -> bdjhgd==
+# echo -n 'mqttXXXXX' | base64 -> bXF0hYdskazQ=
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mqtt-credentials
+type: Opaque
+data:
+  username: bdjhgd==
+  password: bXF0hYdskazQ=
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: foxess-mqtt-config
+
+# mqtt broker you may provide an external IP or internal cluster mqtt pod domain name
+# values to be adjusted to your need
+data:
+  MQTT_BROKER: "mqtt-service.mqtt"
+  MQTT_PORT: "1883"
+  MQTT_TOPIC: "topic1"
+  MQTT_CLIENT_ID: "FoxessHAIntegration"
+  FOXESS_DEVICE_NAME: "FoxessT"
+  FOXESS_MODEL: "T20 G3"
+  FOXESS_MANUFACTURER: "FoxESS"
+  FOXESS_SW_VERSION: "1.2.3"
+  FOXESS_TIME_ZONE: "Europe/Warsaw"
+  LOG_LEVEL: "INFO"

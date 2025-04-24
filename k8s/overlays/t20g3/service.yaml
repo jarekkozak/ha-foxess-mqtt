@@ -1,0 +1,52 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ha-foxess-mqtt-service
+spec:
+  selector:
+    app: ha-foxess-mqtt
+  ports:
+    - targetPort: 8080
+      port: 8080
+---
+# --- middleware-strip-foxess.yaml ---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: strip-foxess-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /foxess
+---
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: ha-foxess-mqtt-ir-tls
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    # This section is to allow access from internal 10* network
+    - match: Host(`your_server`) && PathPrefix(`/foxess`) && ClientIP(`10.0.0.0/8`)
+      kind: Rule
+      services:
+        - name: ha-foxess-mqtt-service
+          port: 8080
+      middlewares:
+        - name: strip-foxess-prefix
+
+    #This section is for external network accesses, ensure that you have auth middleware defined, can be removed
+    - match: Host(`your_server`) && PathPrefix(`/foxess`) && ! ClientIP(`10.0.0.0/8`)
+      kind: Rule
+      services:
+        - name: ha-foxess-mqtt-service
+          port: 8080
+      middlewares:
+        - name: strip-foxess-prefix
+        - name: traefik-auth-middleware
+          namespace: traefik
+  # if you have traefik configured to use TLS
+  tls:
+    certResolver: production

@@ -1,22 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: foxess-rs485
+  name: ha-foxess-mqtt-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: foxess-rs485
+      app: ha-foxess-mqtt
   template:
     metadata:
       labels:
-        app: foxess-rs485
+        app: ha-foxess-mqtt
     spec:
       containers:
-      - name: foxess-rs485
-        image: foxess-rs485:latest
+      - name: ha-foxess-mqtt
+        image: jarekkozak/ha-foxess-mqtt:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: foxess-mqtt-config
+        env:
+          - name: MQTT_USER
+            valueFrom:
+              secretKeyRef:
+                name: mqtt-credentials
+                key: username
+          - name: MQTT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mqtt-credentials
+                key: password
         livenessProbe:
           httpGet:
             path: /health
@@ -35,3 +50,4 @@ spec:
             port: 8080
           failureThreshold: 30
           periodSeconds: 10
+
