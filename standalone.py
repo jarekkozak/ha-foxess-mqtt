@@ -18,21 +18,14 @@
 
 from mqtt_handler import MqttHandler
 from helper import get_mqtt_params, get_foxess_env
-import sys
-import os
 import logging
-logger = logging.getLogger(__name__)
-logging.basicConfig(stream=sys.stdout, level=logging.INFO,
-                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("foxess-standalone")
 
-
-
-if __name__ == '__main__':
-    logger.info("Start reading mqtt messages")
+# if __name__ == '__main__':
     mqtt = get_mqtt_params()
     foxess = get_foxess_env()
-    handler = MqttHandler(log=logger, mqtt_param=mqtt, foxess=foxess)
+
+    logger.info("Start reading mqtt messages")
+    handler = MqttHandler(mqtt_param=mqtt, foxess=foxess)
     handler.start()
-    #handler.mqtt_thread()

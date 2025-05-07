@@ -26,10 +26,11 @@ import datetime
 import pytz
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("rs485_parser")
 
 STATUS_ONLINE = "ONLINE"
 STATUS_OFFLINE = "OFFLINE"
+
 
 class FoxessTSeriesDataParser:
     """

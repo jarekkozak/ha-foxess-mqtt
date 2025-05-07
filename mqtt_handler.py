@@ -28,26 +28,19 @@ from foxess_sensors_handler import FoxessSensorsHandler
 import paho.mqtt.client as mqtt
 import threading
 from datetime import datetime, timedelta
-from helper import set_logger_state,MQTT_CLIENT_ID,MQTT_USER,MQTT_PASSWORD,MQTT_PORT,MQTT_TOPIC,MQTT_BROKER,FOXESS_TIME_ZONE
+from helper import MQTT_CLIENT_ID,MQTT_USER,MQTT_PASSWORD,MQTT_PORT,MQTT_TOPIC,MQTT_BROKER,FOXESS_TIME_ZONE
 import collections
 import logging
 
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("mqtt_handler")
 
 # timeout when inverter goes off line
 TIMEOUT = 3600
-
 MAX_HISTORY_BUFFER = 10
-
 
 class MqttHandler:
 
-    def __init__(self, mqtt_param,foxess={}, log=None):
-        global logger
-        if log is not None:
-            logger = log
-
+    def __init__(self, mqtt_param,foxess={}):
         self.broker = mqtt_param.get(MQTT_BROKER)
         self.port = mqtt_param.get(MQTT_PORT)
         self.topic = mqtt_param.get(MQTT_TOPIC)
@@ -104,9 +97,7 @@ class MqttHandler:
 
     def check_status(self):
         while True:
-            set_logger_state()
-            logger.debug(datetime.now())
-
+            logger.debug("Start check status loop:%s",datetime.now())
             if (self.last_message_timestamp + timedelta(seconds=TIMEOUT)) < datetime.now() and self.status == STATUS_ONLINE:
                 logger.debug("Inverter is offline, last message received at {}".format(self.last_message_timestamp))
                 logger.info("Inverter is offline")
@@ -131,7 +122,6 @@ class MqttHandler:
         self.sensors= FoxessSensorsHandler(self.mqtt_sensor,foxess=self.foxess)
 
         try:
-            set_logger_state()
             self.client.connect(host=self.broker, port=self.port, keepalive=60)
             #self.client.loop_forever()
             self.client.loop_start()
