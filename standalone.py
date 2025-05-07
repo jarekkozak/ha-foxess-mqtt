@@ -22,7 +22,7 @@ import logging
 
 logger = logging.getLogger("foxess-standalone")
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
     mqtt = get_mqtt_params()
     foxess = get_foxess_env()
 
