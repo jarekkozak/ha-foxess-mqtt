@@ -91,7 +91,7 @@ def set_logger_state(level=None):
         l.setLevel(state)
         l.addHandler(queue_handler)
         l.addHandler(console_handler)
-        l.debug("Change logger status %s to s%", l.name,CURRENT_LOG_LEVEL)
+        l.debug("Change logger status %s to %s", l.name,CURRENT_LOG_LEVEL)
 
 
 def refresh_env_variables():

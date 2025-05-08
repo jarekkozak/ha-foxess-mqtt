@@ -23,10 +23,43 @@ from datetime import datetime, timedelta
 import binascii
 import re
 import datetime
+from logging.handlers import RotatingFileHandler
+
 import pytz
 import logging
 
 logger = logging.getLogger("rs485_parser")
+logger_file = logging.getLogger("rs485_parser_file")
+
+# --- Simple File Handler Setup ---
+LOG_FILENAME = 'rs485_parser_simple.log' # Choose your log file name
+
+try:
+    # 1. Create a FileHandler instance
+    #    The 'w' mode will overwrite the file each time the script starts.
+    #    Use 'a' for append mode if you want to keep old logs.
+    simple_file_handler = logging.FileHandler(LOG_FILENAME, mode='a', encoding='utf-8')
+
+    # 2. Set the logging level for this handler
+    #    This handler will process messages of this level or higher.
+    simple_file_handler.setLevel(logging.DEBUG) # Or logging.INFO, logging.WARNING, etc.
+
+    # 3. Create a formatter
+    #    This defines how your log messages will look.
+    formatter = logging.Formatter('%(message)s')
+    simple_file_handler.setFormatter(formatter)
+
+    # 4. Add the handler to your logger
+    logger_file.addHandler(simple_file_handler)
+
+    # Optional: Log that the handler was configured
+    logger.info(f"SimpleFileHandler configured for {LOG_FILENAME}")
+
+except Exception as e:
+    # It's good practice to log any errors during handler setup
+    # This will print to console if the logger isn't fully set up yet or if other handlers exist
+    print(f"Error setting up simple file handler: {e}")
+    logger.error(f"Failed to configure SimpleFileHandler: {e}", exc_info=True)
 
 STATUS_ONLINE = "ONLINE"
 STATUS_OFFLINE = "OFFLINE"
@@ -187,6 +220,8 @@ class FoxessTSeriesDataParser:
         #drop invalid frame
         if crc != crc_check:
             return data[header_index+frame_length:]
+
+        logger_file.debug(frame.hex())
 
         message = {}
         match frame_type:
