@@ -24,6 +24,8 @@ COPY . .
 EXPOSE 8080
 
 # Run the Flask app with healthcheck endpoints
-CMD ["python", "app.py"]
+# CMD ["python", "app.py"]
 # Alternatively, for standalone:
 # CMD ["python", "standalone.py"]
+# Gunicorn - recommended - important run it in the only 1 thread,
+CMD ["gunicorn", "app:app", "-b", "0.0.0.0:8080", "-w", "1", "--log-level", "info"]
