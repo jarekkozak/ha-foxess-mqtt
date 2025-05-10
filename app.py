@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-import json
 # ha-foxess-mqtt
 # Copyright (C) 2025 Jarosław Kozak <jaroslaw.kozak68@gmail.com>
 #
@@ -17,48 +16,15 @@ import json
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 import logging
-import sys
-import collections
-from flask import Flask, render_template, jsonify, Response
-from helper import get_mqtt_params, get_foxess_env,set_logger_state
+from flask import Flask, render_template, jsonify, Response, request
+from helper import get_mqtt_params, get_foxess_env,set_logger_state,log_queue
 from mqtt_handler import MqttHandler
 
-MAX_LOG_LINES = 100
+logger = logging.getLogger("livelogviewer") # You can use logging.getLogger('my_app') if you prefer
 
-# Queue for logs, limited length to preserve memory
-log_queue = collections.deque(maxlen=MAX_LOG_LINES)
-
-# --- Custom logging handler saving to the queue ---
-class QueueLogHandler(logging.Handler):
-    def __init__(self, queue):
-        super().__init__()
-        self.queue = queue
-
-    def emit(self, record):
-        # We format the log and add it to the queue
-        log_entry = self.format(record)
-        self.queue.append(log_entry)
-
-# --- Logging configuration ---
-log_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-queue_handler = QueueLogHandler(log_queue)
-queue_handler.setFormatter(log_formatter)
-
-# Handler for the console
-console_handler = logging.StreamHandler(sys.stdout)
-console_handler.setFormatter(log_formatter)
-
-# We configure the main logger (root) or a specific application logger
-logger = logging.getLogger() # You can use logging.getLogger('my_app') if you prefer
-logger.addHandler(queue_handler)
-logger.addHandler(console_handler)
-
-set_logger_state()
 
 mqtt = get_mqtt_params()
 foxess = get_foxess_env()
-mqtt_handler = MqttHandler(log=logger, mqtt_param=mqtt, foxess=foxess)
-logger.info(str(mqtt))
 
 # --- Flask Application ---
 app = Flask(__name__)
@@ -92,12 +58,26 @@ def ready():
     else:
         return Response(status=500)
 
+@app.route('/set_log_level', methods=['POST'])
+def set_log_level():
+    level = request.json.get('level', 'INFO').upper()
+    if level == 'DEBUG':
+        set_logger_state(logging.DEBUG)
+        logger.info("Log level set to DEBUG")
+    elif level == 'INFO':
+        set_logger_state(logging.INFO)
+        logger.info("Log level set to INFO")
+    # Add other levels if needed (WARNING, ERROR, CRITICAL)
+    return jsonify(status="success", level=level)
+
+
+mqtt_handler = MqttHandler(mqtt_param=mqtt, foxess=foxess)
+set_logger_state()
+
+logger.info("Starting Log Viewer application...")
+mqtt_handler.start()
 
 if __name__ == '__main__':
-    logger.info("Starting Flask Log Viewer application...")
-    logger.info("Envinroment vars:")
-    logger.info(json.dumps(mqtt,indent=4))
-    logger.info(json.dumps(foxess, indent=4))
-    mqtt_handler.start()
+    logger.info("Starting Flask server")
     # do not use debug=True, it causes connection issues
     app.run(debug=False, host='0.0.0.0', port=8080)

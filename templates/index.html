@@ -14,6 +14,15 @@
         h1 {
             color: #333;
         }
+        .controls {
+           margin-bottom: 20px;
+       }
+       .controls button {
+           padding: 10px 15px;
+           font-size: 1em;
+           cursor: pointer;
+           margin-right: 10px;
+       }
         #log-output {
             background-color: #2d2d2d;
             color: #dcdcdc;
@@ -34,74 +43,106 @@
     </style>
 </head>
 <body>
-    <h1>Foxess Live Log Viewer</h1>
-    <div id="env">
-        <h2>Environment Variables</h2>
+<h1>Foxess Live Log Viewer</h1>
+<div id="env">
+    <h2>Environment Variables</h2>
     <table id="env-vars-table">
         <thead>
-            <tr>
-                <th>Variable Name</th>
-                <th>Value</th>
-            </tr>
+        <tr>
+            <th>Variable Name</th>
+            <th>Value</th>
+        </tr>
         </thead>
         <tbody>
-            {% if env_vars %} {% for key, value in env_vars.items() %}
-                <tr>
-                    <td>{{ key }}</td>
-                    <td>{{ value }}</td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="2">No environment variables passed to template.</td>
-                </tr>
-            {% endif %}
+        {% if env_vars %} {% for key, value in env_vars.items() %}
+        <tr>
+            <td>{{ key }}</td>
+            <td>{{ value }}</td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="2">No environment variables passed to template.</td>
+        </tr>
+        {% endif %}
         </tbody>
     </table>
-    </div>
-    <pre id="log-output">Loading logs...</pre>
-    <div id="status"></div>
+</div>
+<div class="controls">
+    <button id="debug-button">Set Log Level to DEBUG</button>
+    <button id="info-button">Set Log Level to INFO</button>
+</div>
+<pre id="log-output">Loading logs...</pre>
+<div id="status"></div>
 
-    <script>
-        const logOutput = document.getElementById('log-output');
-        const statusDiv = document.getElementById('status');
-        let isScrolledToBottom = true; // Variable tracking if the user is at the bottom
+<script>
+    const logOutput = document.getElementById('log-output');
+    const statusDiv = document.getElementById('status');
+    const debugButton = document.getElementById('debug-button');
+    const infoButton = document.getElementById('info-button');
+    let isScrolledToBottom = true; // Variable tracking if the user is at the bottom
 
-        // Check if the user is at the bottom before updating
-        logOutput.addEventListener('scroll', () => {
-            // Check if the scroll is close to the bottom (with a small margin)
-            isScrolledToBottom = logOutput.scrollHeight - logOutput.scrollTop <= logOutput.clientHeight + 10;
-        });
+    // Check if the user is at the bottom before updating
+    logOutput.addEventListener('scroll', () => {
+        // Check if the scroll is close to the bottom (with a small margin)
+        isScrolledToBottom = logOutput.scrollHeight - logOutput.scrollTop <= logOutput.clientHeight + 10;
+    });
 
+       async function setLogLevel(level) {
+           try {
+               const response = await fetch('set_log_level', {
+                   method: 'POST',
+                   headers: {
+                       'Content-Type': 'application/json'
+                   },
+                   body: JSON.stringify({ level: level })
+               });
+               const data = await response.json();
+               console.log(`Log level set to ${data.level}`);
+               if (data.status === "success") {
+                   window.location.reload();
+               }
+           } catch (error) {
+               console.error('Error setting log level:', error);
+           }
+       }
 
-        async function fetchLogs() {
-            try {
-                const response = await fetch('logs');
-                if (!response.ok) {
-                    throw new Error(`HTTP Error: ${response.status}`);
-                }
-                const data = await response.json();
+       debugButton.addEventListener('click', () => {
+           setLogLevel('DEBUG');
+       });
 
-                if (logOutput.textContent !== data.logs) {
-                    logOutput.textContent = data.logs;
-                    statusDiv.textContent = `Updated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+       infoButton.addEventListener('click', () => {
+           setLogLevel('INFO');
+       });
 
-                    if (isScrolledToBottom) {
-                         logOutput.scrollTop = logOutput.scrollHeight;
-                    }
-                } else {
-                     statusDiv.textContent = `No new logs. Last update: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} `;
-                }
-
-
-            } catch (error) {
-                console.error('Could not fetch logs:', error);
-                logOutput.textContent = `Error loading logs: ${error.message}\n\n${logOutput.textContent}`;
-                statusDiv.textContent = `Update error: ${new Date().toLocaleTimeString()}`;
+    async function fetchLogs() {
+        try {
+            const response = await fetch('logs');
+            if (!response.ok) {
+                throw new Error(`HTTP Error: ${response.status}`);
             }
+            const data = await response.json();
+
+            if (logOutput.textContent !== data.logs) {
+                logOutput.textContent = data.logs;
+                statusDiv.textContent = `Updated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}`;
+
+                if (isScrolledToBottom) {
+                     logOutput.scrollTop = logOutput.scrollHeight;
+                }
+            } else {
+                 statusDiv.textContent = `No new logs. Last update: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()} `;
+            }
+
+
+        } catch (error) {
+            console.error('Could not fetch logs:', error);
+            logOutput.textContent = `Error loading logs: ${error.message}\n\n${logOutput.textContent}`;
+            statusDiv.textContent = `Update error: ${new Date().toLocaleTimeString()}`;
         }
-        fetchLogs();
-        setInterval(fetchLogs, 5000);
-    </script>
+    }
+    fetchLogs();
+    setInterval(fetchLogs, 5000);
+</script>
 </body>
 </html>

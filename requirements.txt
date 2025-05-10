@@ -3,3 +3,4 @@ paho-mqtt
 ha-mqtt-discoverable
 Flask
 pytz
+gunicorn
