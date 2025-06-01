@@ -209,6 +209,7 @@ class FoxessTSeriesDataParser:
         frame_type = int.from_bytes(match.group(2), 'big')
         frame_length = header_index+ 6 + int.from_bytes(match.group(1), 'big')
         frame = data[header_index:frame_length]
+        logger.debug(f"Frame caught:{frame.hex()}")
         # if there is not enouch data
         if len(frame)<frame_length:
             return data
@@ -216,7 +217,7 @@ class FoxessTSeriesDataParser:
         frame_data = frame[8:-2]
         crc = int.from_bytes(frame[-2:],'little')
         crc_check = self.crc16_modbus(frame_data)
-
+        logger.debug(f"Crc read: {crc}, calculated: { crc_check}")
         #drop invalid frame
         if crc != crc_check:
             return data[header_index+frame_length:]
