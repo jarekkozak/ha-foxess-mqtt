@@ -212,14 +212,16 @@ class FoxessTSeriesDataParser:
         logger.debug(f"Frame caught:{frame.hex()}")
         # if there is not enouch data
         if len(frame)<frame_length:
+            logger.debug(f"Not enough data - skipping, frame length:{frame_length}, data len {len(frame)} ")
             return data
+        # Tutaj mechanizm samonaprawczy jeśli bufor jest większy niż długość danych a jednak następuje pominięcie to wyczyścić bufor
 
         frame_data = frame[8:-2]
         crc = int.from_bytes(frame[-2:],'little')
         crc_check = self.crc16_modbus(frame_data)
-        logger.debug(f"Crc read: {crc}, calculated: { crc_check}")
         #drop invalid frame
         if crc != crc_check:
+            logger.debug(f"Crc check failed,  values read: {crc}, calculated: {crc_check}")
             return data[header_index+frame_length:]
 
         logger_file.debug(frame.hex())
