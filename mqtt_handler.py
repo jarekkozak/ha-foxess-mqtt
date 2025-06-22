@@ -37,6 +37,8 @@ logger = logging.getLogger("mqtt_handler")
 # timeout when inverter goes off line
 TIMEOUT = 3600
 MAX_HISTORY_BUFFER = 10
+# max cache size in bytes
+MAX_CACHE_SIZE = 10000
 
 class MqttHandler:
 
@@ -94,6 +96,15 @@ class MqttHandler:
                     self.sensors.process_data(f)
                 logger.info(f"data processed {f}")
                 self.history.append(f)
+
+
+        # After messages are parsed cache should be clear, in case of rubbish in cache clear it
+        if len(self.CACHE)>MAX_CACHE_SIZE:
+            logger.debug(f"Clearing ca cache, max size exceeded:{len(self.CACHE)}")
+            self.CACHE = bytearray()
+
+
+
 
     def check_status(self):
         while True:
